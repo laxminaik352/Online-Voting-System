@@ -1,0 +1,75 @@
+### ==========================================================================
+### CampusVote - VS Code REST Client API Queries
+### (Works with VS Code "REST Client" extension or cURL)
+### ==========================================================================
+
+@baseUrl = http://localhost:3000/api
+
+### 1. Health Check
+GET {{baseUrl}}/health
+
+### 2. Login as Student USN 33 (Kiran Kumar)
+# @name loginStudent
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "identifier": "U15FY24S0033",
+  "password": "Password@123"
+}
+
+### Save Student Token
+@studentToken = {{loginStudent.response.body.token}}
+
+### 3. Get Student Profile & Voting History
+GET {{baseUrl}}/auth/profile
+Authorization: Bearer {{studentToken}}
+
+### 4. Get Active Elections & Contests
+GET {{baseUrl}}/elections
+
+### 5. Get Election Details with Positions & Candidates
+GET {{baseUrl}}/elections/1
+Authorization: Bearer {{studentToken}}
+
+### 6. Cast Vote for President (Candidate ID: 1)
+POST {{baseUrl}}/votes/cast
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{
+  "election_id": 1,
+  "position_id": 1,
+  "candidate_id": 1
+}
+
+### 7. Public Cryptographic Receipt Verification
+GET {{baseUrl}}/votes/receipt/CV-2026-A1B2C3D4
+
+### 8. View Live Election Results & Turnout Analytics
+GET {{baseUrl}}/results/1
+
+### 9. Login as Admin / Chief Election Officer
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "identifier": "ADMIN001",
+  "password": "Admin@123"
+}
+
+### Save Admin Token
+@adminToken = {{loginAdmin.response.body.token}}
+
+### 10. Admin: View All Registered Voters
+GET {{baseUrl}}/admin/voters
+Authorization: Bearer {{adminToken}}
+
+### 11. Admin: View System Audit Logs
+GET {{baseUrl}}/admin/audit-logs
+Authorization: Bearer {{adminToken}}
+
+### 12. Admin: Reset & Re-Seed Database for Presentation
+POST {{baseUrl}}/admin/reset-seed
+Authorization: Bearer {{adminToken}}
